@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سباق الحروف</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0d0630 0%, #190a43 50%, #0d0630 100%);
+      --card-bg: rgba(255, 255, 255, 0.07);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text-color: #ffffff;
+      --accent-gold: #ffc107;
+      --accent-green: #22c55e;
+      --accent-blue: #3b82f6;
+      --accent-purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px 10px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 650px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .screen {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .trophy-icon {
+      font-size: 60px;
+      margin-top: 10px;
+    }
+
+    h1.game-title {
+      font-size: 38px;
+      font-weight: 800;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    .user-profile-card {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .xp-bar-container {
+      width: 100%;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .xp-bar-fill {
+      width: 20%;
+      height: 100%;
+      background: var(--accent-gold);
+      border-radius: 10px;
+    }
+
+    .rank-badge {
+      align-self: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid var(--card-border);
+    }
+
+    .menu-section {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-grid {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.1s, opacity 0.2s;
+      min-width: 110px;
+    }
+
+    .btn:active { transform: scale(0.96); }
+    .btn-green { background: #22c55e; }
+    .btn-yellow { background: #eab308; color: #000; }
+    .btn-red { background: #ef4444; }
+    .btn-blue { background: #3b82f6; }
+    .btn-purple { background: #a855f7; }
+    .btn-dark { background: rgba(255, 255, 255, 0.15); border: 1px solid var(--card-border); }
+
+    .bottom-nav {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: center;
+      margin-top: 5px;
+    }
+
+    .bottom-nav .btn {
+      flex: 1;
+      padding: 12px 10px;
+      font-size: 14px;
+    }
+
+    .top-scoreboard {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 10px;
+    }
+
+    .player-card {
+      flex: 1;
+      background: var(--card-bg);
+      border: 2px solid transparent;
+      border-radius: 18px;
+      padding: 12px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .player-card.active {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+    }
+
+    .player-name {
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .hearts {
+      color: #ef4444;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .score-num {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .timer-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .sub-info-bar {
+      display: flex;
+      gap: 10px;
+    }
+
+    .pill-info {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid var(--card-border);
+    }
+
+    .banner-prompt {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      border: 1px solid var(--card-border);
+      color: #ffc107;
+    }
+
+    .input-row {
+      display: flex;
+      width: 100%;
+      gap: 8px;
+    }
+
+    .answer-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: white;
+      font-size: 16px;
+      outline: none;
+      text-align: center;
+    }
+
+    .answer-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .submit-btn {
+      background: #22c55e;
+      border: none;
+      border-radius: 12px;
+      width: 50px;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .letters-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .letter-btn {
+      aspect-ratio: 1;
+      background: #ffffff;
+      color: #111827;
+      border: none;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+
+    .letter-btn.gold {
+      background: var(--accent-gold);
+      color: #000;
+      box-shadow: 0 0 12px rgba(255, 193, 7, 0.8);
+    }
+
+    .letter-btn.selected {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+
+    .exit-btn {
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 8px 18px;
+      color: white;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Main Menu View -->
+  <div id="mainMenuView" class="screen">
+    <div class="trophy-icon">🏆</div>
+    <h1 class="game-title">سباق الحروف</h1>
+
+    <div class="user-profile-card">
+      <div class="profile-header">
+        <span id="userNameDisplay">Amal 👤</span>
+        <span id="coinsDisplay">🪙 0</span>
+      </div>
+      <div class="profile-header" style="font-size: 13px; color: rgba(255,255,255,0.7);">
+        <span>المستوى 1 ⭐</span>
+        <span>20 / 100 خبرة</span>
+      </div>
+      <div class="xp-bar-container">
+        <div class="xp-bar-fill"></div>
+      </div>
+      <div class="rank-badge">الرتبة 🌱 مبتدئ</div>
+    </div>
+
+    <div class="menu-section">
+      <div class="section-title">🤖 ضد روبوت 👤</div>
+      <div class="btn-grid">
+        <button class="btn btn-green" onclick="startBotGame('easy')">سهل 🟢</button>
+        <button class="btn btn-yellow" onclick="startBotGame('medium')">متوسط 🟡</button>
+        <button class="btn btn-red" onclick="startBotGame('hard')">صعب 🔴</button>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <div class="section-title">👥 على نفس الجهاز</div>
+      <div class="btn-grid">
+        <button class="btn btn-blue" onclick="startLocalGame(2)">لاعبان</button>
+        <button class="btn btn-purple" onclick="startLocalGame(3)">ثلاثة لاعبين</button>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="btn btn-dark">⚙️ الإعدادات</button>
+      <button class="btn btn-purple">🥇 الإنجازات</button>
+      <button class="btn btn-dark">📊 الإحصائيات</button>
+    </div>
+  </div>
+
+  <!-- Game Play View -->
+  <div id="gamePlayView" class="screen hidden">
+    <div class="top-scoreboard">
+      <div class="player-card active" id="p1Card">
+        <div class="player-name" id="p1Name">اللاعب 1</div>
+        <div class="hearts" id="p1Hearts">❤️❤️❤️</div>
+        <div class="score-num" id="p1Score">0</div>
+      </div>
+
+      <div class="timer-circle" id="timerDisplay">20</div>
+
+      <div class="player-card" id="p2Card">
+        <div class="player-name" id="p2Name">الكمبيوتر</div>
+        <div class="hearts" id="p2Hearts">❤️❤️❤️</div>
+        <div class="score-num" id="p2Score">0</div>
+      </div>
+    </div>
+
+    <div class="sub-info-bar">
+      <div class="pill-info" id="roundDisplay">الجولة 1</div>
+      <div class="pill-info" id="goldLetterDisplay">الذهبي: ف 💎</div>
+    </div>
+
+    <div class="banner-prompt" id="promptBanner">اذكر (حيوان) يبدأ بحرف (ف)</div>
+
+    <div class="input-row">
+      <input type="text" class="answer-input" id="answerInput" placeholder="اكتب الإجابة هنا..." autocomplete="off">
+      <button class="submit-btn" onclick="handleWordSubmit()">✓</button>
+    </div>
+
+    <div class="letters-grid" id="lettersGrid"></div>
+
+    <button class="exit-btn" onclick="exitToMenu()">🔄 خروج للقائمة</button>
+  </div>
+</div>
+
+<script>
+  const ARABIC_LETTERS = [
+    'أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ',
+    'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص',
+    'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق',
+    'ك', 'ل', 'م', 'ن', 'هـ', 'و', 'ي'
+  ];
+
+  const CATEGORIES = ['حيوان', 'بلاد', 'جماد', 'أكلة'];
+
+  const DICTIONARY = {
+    'حيوان': {
+      'أ': ['أسد', 'أرنب'], 'ب': ['بقرة', 'بطة'], 'ت': ['تمساح'], 'ث': ['ثعلب'], 'ج': ['جمل'],
+      'ح': ['حصان'], 'خ': ['خروف'], 'د': ['دب', 'دجاجة'], 'ذ': ['ذئب'], 'ر': ['راكون'],
+      'ز': ['زرافة'], 'س': ['سمكة', 'سنجاب'], 'ش': ['شيمبانزي'], 'ص': ['صقر'], 'ض': ['ضبع'],
+      'ط': ['طاووس'], 'ظ': ['ظبي'], 'ع': ['عصفور'], 'غ': ['غزال'], 'ف': ['فيل', 'فهد'],
+      'ق': ['قرد', 'قطة'], 'ك': ['كلب'], 'ل': ['لقلق'], 'م': ['ماعز'], 'ن': ['نمر', 'نملة'],
+      'هـ': ['هدهد'], 'و': ['وحيد القرن'], 'ي': ['يمامة']
+    },
+    'بلاد': {
+      'أ': ['ألمانيا', 'أردن'], 'ب': ['البحرين', 'برازيل'], 'ت': ['تونس', 'تركيا'], 'ث': ['ثايلاند'], 'ج': ['الجزائر'],
+      'ح': ['الحجاز'], 'خ': ['خرطوم'], 'د': ['دبي', 'الدمام'], 'ذ': ['ذمار'], 'ر': ['الرياض', 'رومانيا'],
+      'ز': ['زيمبابوي'], 'س': ['السعودية', 'سوريا'], 'ش': ['الشارقة'], 'ص': ['السينغال', 'صين'], 'ض': ['ضبا'],
+      'ط': ['طوكيو'], 'ظ': ['ظفار'], 'ع': ['عمان', 'عراق'], 'غ': ['غانا'], 'ف': ['فرنسا', 'فلسطين'],
+      'ق': ['قطر'], 'ك': ['الكويت', 'كندا'], 'ل': ['لبنان'], 'م': ['مصر', 'المغرب'], 'ن': ['النيجر', 'نرويج'],
+      'هـ': ['الهند'], 'و': ['واشنطن'], 'ي': ['اليمن']
+    },
+    'جماد': {
+      'أ': ['أبرة'], 'ب': ['باب'], 'ت': ['تلفاز'], 'ث': ['ثلاجة'], 'ج': ['جدار'],
+      'ح': ['حبل'], 'خ': ['خزانة'], 'د': ['دفتر'], 'ذ': ['ذهب'], 'ر': ['رف'],
+      'ز': ['زجاج'], 'س': ['ساعة', 'سيارة'], 'ش': ['شباك'], 'ص': ['صندوق'], 'ض': ['ضوء'],
+      'ط': ['طاولة'], 'ظ': ['ظرف'], 'ع': ['علبة'], 'غ': ['غسالة'], 'ف': ['فانوس', 'فستان'],
+      'ق': ['قلم'], 'ك': ['كرسي'], 'ل': ['لعبة'], 'م': ['مفتاح'], 'ن': ['نظارة'],
+      'هـ': ['هاتف'], 'و': ['ورقة'], 'ي': ['ياقوت']
+    },
+    'أكلة': {
+      'أ': ['أرز'], 'ب': ['برجر', 'بيتزا'], 'ت': ['تفاح', 'تمر'], 'ث': ['ثوم'], 'ج': ['جبن'],
+      'ح': ['حمص'], 'خ': ['خبز', 'يار'], 'د': ['دجاج'], 'ذ': ['ذرة'], 'ر': ['رمان'],
+      'ز': ['زيتون'], 'س': ['سمك', 'سلطة'], 'ش': ['شوربة'], 'ص': ['صفيحة'], 'ض': ['ضأن'],
+      'ط': ['طماطم'], 'ظ': ['ظبي مشوي'], 'ع': ['عنب', 'عدس'], 'غ': ['غزل البنات'], 'ف': ['فطيرة', 'فلافل', 'فول'],
+      'ق': ['قهوة'], 'ك': ['كبة', 'كيك'], 'ل': ['لحم'], 'م': ['ملوخية', 'مانجو'], 'ن': ['نعناع'],
+      'هـ': ['هريس'], 'و': ['ورق عنب'], 'ي': ['يوسفي']
+    }
+  };
+
+  let gameMode = 'bot'; // 'bot' or 'local'
+  let botDifficulty = 'easy'; // 'easy', 'medium', 'hard'
+  let currentPlayer = 1;
+  let totalPlayers = 2;
+  
+  let p1Score = 0, p2Score = 0;
+  let p1Hearts = 3, p2Hearts = 3;
+  let currentRound = 1;
+  let currentLetter = 'ف';
+  let currentCategory = 'حيوان';
+  
+  let timerVal = 20;
+  let timerInterval = null;
+
+  function setPrompt() {
+    document.getElementById('promptBanner').innerText = `اذكر (${currentCategory}) يبدأ بحرف (${currentLetter})`;
+    document.getElementById('goldLetterDisplay').innerText = `الذهبي: ${currentLetter} 💎`;
+    document.getElementById('roundDisplay').innerText = `الجولة ${currentRound}`;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('lettersGrid');
+    grid.innerHTML = '';
+    ARABIC_LETTERS.forEach(char => {
+      const btn = document.createElement('button');
+      btn.className = `letter-btn ${char === currentLetter ? 'gold' : ''}`;
+      btn.innerText = char;
+      btn.onclick = () => {
+        currentLetter = char;
+        setPrompt();
+        renderGrid();
+      };
+      grid.appendChild(btn);
+    });
+  }
+
+  function startBotGame(diff) {
+    gameMode = 'bot';
+    botDifficulty = diff;
+    totalPlayers = 2;
+    document.getElementById('p1Name').innerText = 'اللاعب 1';
+    document.getElementById('p2Name').innerText = `الروبوت (${diff === 'easy' ? 'سهل' : diff === 'medium' ? 'متوسط' : 'صعب'})`;
+    initGame();
+  }
+
+  function startLocalGame(playersCount) {
+    gameMode = 'local';
+    totalPlayers = playersCount;
+    document.getElementById('p1Name').innerText = 'اللاعب 1';
+    document.getElementById('p2Name').innerText = playersCount === 3 ? 'اللاعب 2 / 3' : 'اللاعب 2';
+    initGame();
+  }
+
+  function initGame() {
+    p1Score = 0; p2Score = 0;
+    p1Hearts = 3; p2Hearts = 3;
+    currentRound = 1;
+    currentPlayer = 1;
+    
+    document.getElementById('p1Score').innerText = '0';
+    document.getElementById('p2Score').innerText = '0';
+    document.getElementById('p1Hearts').innerText = '❤️❤️❤️';
+    document.getElementById('p2Hearts').innerText = '❤️❤️❤️';
+
+    document.getElementById('mainMenuView').classList.add('hidden');
+    document.getElementById('gamePlayView').classList.remove('hidden');
+
+    nextTurn();
+  }
+
+  function nextTurn() {
+    // Pick random letter and category for each round/turn
+    currentLetter = ARABIC_LETTERS[Math.floor(Math.random() * ARABIC_LETTERS.length)];
+    currentCategory = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)];
+    setPrompt();
+    renderGrid();
+    updateActiveCard();
+
+    startTimer();
+
+    if (gameMode === 'bot' && currentPlayer === 2) {
+      document.getElementById('answerInput').disabled = true;
+      document.getElementById('answerInput').placeholder = 'جاري تفكير الروبوت...';
+      playBotTurn();
+    } else {
+      document.getElementById('answerInput').disabled = false;
+      document.getElementById('answerInput').placeholder = 'اكتب الإجابة هنا...';
+      document.getElementById('answerInput').focus();
+    }
+  }
+
+  function updateActiveCard() {
+    if (currentPlayer === 1) {
+      document.getElementById('p1Card').classList.add('active');
+      document.getElementById('p2Card').classList.remove('active');
+    } else {
+      document.getElementById('p2Card').classList.add('active');
+      document.getElementById('p1Card').classList.remove('active');
+    }
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerVal = 20;
+    document.getElementById('timerDisplay').innerText = timerVal;
+    timerInterval = setInterval(() => {
+      timerVal--;
+      document.getElementById('timerDisplay').innerText = timerVal;
+      if (timerVal <= 0) {
+        clearInterval(timerInterval);
+        handleTimeout();
+      }
+    }, 1000);
+  }
+
+  function handleTimeout() {
+    alert(`انتهى الوقت للاعب ${currentPlayer}!`);
+    deductHeart(currentPlayer);
+    switchPlayer();
+  }
+
+  function switchPlayer() {
+    clearInterval(timerInterval);
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    currentRound++;
+    nextTurn();
+  }
+
+  function deductHeart(p) {
+    if (p === 1) {
+      p1Hearts--;
+      document.getElementById('p1Hearts').innerText = '❤️'.repeat(Math.max(0, p1Hearts));
+      if (p1Hearts <= 0) endGame('خسرت المباراة! فاز المنافس.');
+    } else {
+      p2Hearts--;
+      document.getElementById('p2Hearts').innerText = '❤️'.repeat(Math.max(0, p2Hearts));
+      if (p2Hearts <= 0) endGame('مبروك! فزت بالمباراة 🎉');
+    }
+  }
+
+  function handleWordSubmit() {
+    if (gameMode === 'bot' && currentPlayer === 2) return;
+    
+    const inputField = document.getElementById('answerInput');
+    const word = inputField.value.trim();
+    if (!word) return;
+
+    const validWords = (DICTIONARY[currentCategory] && DICTIONARY[currentCategory][currentLetter]) || [];
+    
+    // Check if word starts with letter and is in category or basic check
+    const startsWithCorrect = word.startsWith(currentLetter) || (currentLetter === 'أ' && (word.startsWith('ا') || word.startsWith('أ')));
+
+    if (startsWithCorrect) {
+      alert(`إجابة صحيحة! (+10 نقاط)`);
+      if (currentPlayer === 1) {
+        p1Score += 10;
+        document.getElementById('p1Score').innerText = p1Score;
+      } else {
+        p2Score += 10;
+        document.getElementById('p2Score').innerText = p2Score;
+      }
+      inputField.value = '';
+      switchPlayer();
+    } else {
+      alert(`إجابة خاطئة! يجب أن تبدأ بحرف (${currentLetter}) وتكون (${currentCategory})`);
+      inputField.value = '';
+    }
+  }
+
+  function playBotTurn() {
+    let delay = botDifficulty === 'easy' ? 4000 : botDifficulty === 'medium' ? 2500 : 1200;
+    setTimeout(() => {
+      const validWords = (DICTIONARY[currentCategory] && DICTIONARY[currentCategory][currentLetter]) || [];
+      const failRate = botDifficulty === 'easy' ? 0.5 : botDifficulty === 'medium' ? 0.25 : 0.05;
+      
+      if (validWords.length > 0 && Math.random() > failRate) {
+        const botWord = validWords[Math.floor(Math.random() * validWords.length)];
+        alert(`الروبوت أجاب: ${botWord} (إجابة صحيحة!)`);
+        p2Score += 10;
+        document.getElementById('p2Score').innerText = p2Score;
+      } else {
+        alert(`الروبوت لم يستطع إيجاد إجابة في الوقت المناسب!`);
+        deductHeart(2);
+      }
+      switchPlayer();
+    }, delay);
+  }
+
+  function endGame(msg) {
+    clearInterval(timerInterval);
+    alert(msg);
+    exitToMenu();
+  }
+
+  function exitToMenu() {
+    clearInterval(timerInterval);
+    document.getElementById('gamePlayView').classList.add('hidden');
+    document.getElementById('mainMenuView').classList.remove('hidden');
+  }
+
+  // Handle Enter Key on Input
+  document.getElementById('answerInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      handleWordSubmit();
+    }
+  });
+</script>
+</body>
+</html>
