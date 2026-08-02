@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سباق الحروف</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0d0630 0%, #190a43 50%, #0d0630 100%);
+      --card-bg: rgba(255, 255, 255, 0.07);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text-color: #ffffff;
+      --accent-gold: #ffc107;
+      --accent-green: #22c55e;
+      --accent-blue: #3b82f6;
+      --accent-purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px 10px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 650px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .screen {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .trophy-icon {
+      font-size: 60px;
+      margin-top: 10px;
+    }
+
+    h1.game-title {
+      font-size: 38px;
+      font-weight: 800;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    .user-profile-card {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .xp-bar-container {
+      width: 100%;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .xp-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--accent-gold);
+      border-radius: 10px;
+    }
+
+    .rank-badge {
+      align-self: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid var(--card-border);
+    }
+
+    .menu-section {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-grid {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.1s, opacity 0.2s;
+      min-width: 110px;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-green { background: #22c55e; }
+    .btn-yellow { background: #eab308; color: #000; }
+    .btn-red { background: #ef4444; }
+    .btn-blue { background: #3b82f6; }
+    .btn-purple { background: #a855f7; }
+    .btn-dark { background: rgba(255, 255, 255, 0.15); border: 1px solid var(--card-border); }
+
+    .bottom-nav {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: center;
+      margin-top: 5px;
+    }
+
+    .bottom-nav .btn {
+      flex: 1;
+      padding: 12px 10px;
+      font-size: 14px;
+    }
+
+    .top-scoreboard {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 10px;
+    }
+
+    .player-card {
+      flex: 1;
+      background: var(--card-bg);
+      border: 2px solid transparent;
+      border-radius: 18px;
+      padding: 12px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .player-card.active {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+    }
+
+    .player-name {
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .hearts {
+      color: #ef4444;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .score-num {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .timer-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .sub-info-bar {
+      display: flex;
+      gap: 10px;
+    }
+
+    .pill-info {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid var(--card-border);
+    }
+
+    .banner-prompt {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      border: 1px solid var(--card-border);
+    }
+
+    .input-row {
+      display: flex;
+      width: 100%;
+      gap: 8px;
+    }
+
+    .answer-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: white;
+      font-size: 16px;
+      outline: none;
+      text-align: center;
+    }
+
+    .answer-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .submit-btn {
+      background: #22c55e;
+      border: none;
+      border-radius: 12px;
+      width: 50px;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .letters-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .letter-btn {
+      aspect-ratio: 1;
+      background: #ffffff;
+      color: #111827;
+      border: none;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+
+    .letter-btn.gold {
+      background: var(--accent-gold);
+      color: #000;
+      box-shadow: 0 0 12px rgba(255, 193, 7, 0.8);
+    }
+
+    .exit-btn {
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 8px 18px;
+      color: white;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Main Menu View -->
+  <div id="mainMenuView" class="screen">
+    <div class="trophy-icon">🏆</div>
+    <h1 class="game-title">سباق الحروف</h1>
+
+    <div class="user-profile-card">
+      <div class="profile-header">
+        <span id="userNameDisplay">Amal 👤</span>
+        <span>🪙 0</span>
+      </div>
+      <div class="profile-header" style="font-size: 13px; color: rgba(255,255,255,0.7);">
+        <span>المستوى 1 ⭐</span>
+        <span>0 / 100 خبرة</span>
+      </div>
+      <div class="xp-bar-container">
+        <div class="xp-bar-fill"></div>
+      </div>
+      <div class="rank-badge">الرتبة 🌱 مبتدئ</div>
+    </div>
+
+    <div class="menu-section">
+      <div class="section-title">🌐 لعب أونلاين</div>
+      <div class="btn-grid">
+        <button class="btn btn-purple" onclick="startOnlineGame()">بحث عن مباراة ⚔️</button>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <div class="section-title">🤖 ضد روبوت 👤</div>
+      <div class="btn-grid">
+        <button class="btn btn-green" onclick="startGame('bot', 'easy')">سهل 🟢</button>
+        <button class="btn btn-yellow" onclick="startGame('bot', 'medium')">متوسط 🟡</button>
+        <button class="btn btn-red" onclick="startGame('bot', 'hard')">صعب 🔴</button>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <div class="section-title">👥 على نفس الجهاز</div>
+      <div class="btn-grid">
+        <button class="btn btn-blue" onclick="startGame('local', 2)">لاعبان</button>
+        <button class="btn btn-purple" onclick="startGame('local', 3)">ثلاثة لاعبين</button>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="btn btn-dark">⚙️ الإعدادات</button>
+      <button class="btn btn-purple">🥇 الإنجازات</button>
+      <button class="btn btn-dark">📊 الإحصائيات</button>
+    </div>
+  </div>
+
+  <!-- Game Play View -->
+  <div id="gamePlayView" class="screen hidden">
+    <div class="top-scoreboard">
+      <div class="player-card active" id="p1Card">
+        <div class="player-name" id="p1Name">اللاعب 1</div>
+        <div class="hearts">❤️❤️❤️</div>
+        <div class="score-num" id="p1Score">0</div>
+      </div>
+
+      <div class="timer-circle" id="timerDisplay">20</div>
+
+      <div class="player-card" id="p2Card">
+        <div class="player-name" id="p2Name">اللاعب 2</div>
+        <div class="hearts">❤️❤️❤️</div>
+        <div class="score-num" id="p2Score">0</div>
+      </div>
+    </div>
+
+    <div class="sub-info-bar">
+      <div class="pill-info" id="roundDisplay">الجولة 1</div>
+      <div class="pill-info" id="goldLetterDisplay">الذهبي: ف 💎</div>
+    </div>
+
+    <div class="banner-prompt" id="promptBanner">اختر حرفاً</div>
+
+    <div class="input-row">
+      <input type="text" class="answer-input" id="answerInput" placeholder="اكتب الإجابة هنا..." autocomplete="off">
+      <button class="submit-btn" onclick="handleWordSubmit()">✓</button>
+    </div>
+
+    <div class="letters-grid" id="lettersGrid"></div>
+
+    <button class="exit-btn" onclick="exitToMenu()">🔄 خروج للقائمة</button>
+  </div>
+</div>
+
+<script type="module" src="firebase-config.js"></script>
+<script type="module" src="online.js"></script>
+<script>
+  const ARABIC_LETTERS = [
+    'أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ',
+    'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص',
+    'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق',
+    'ك', 'ل', 'م', 'ن', 'هـ', 'و', 'ي'
+  ];
+
+  let currentLetter = 'ف';
+  let timerVal = 20;
+  let timerInterval = null;
+
+  function renderGrid() {
+    const grid = document.getElementById('lettersGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    ARABIC_LETTERS.forEach(char => {
+      const btn = document.createElement('button');
+      btn.className = `letter-btn ${char === currentLetter ? 'gold' : ''}`;
+      btn.innerText = char;
+      btn.onclick = () => selectLetter(char);
+      grid.appendChild(btn);
+    });
+  }
+
+  function selectLetter(char) {
+    currentLetter = char;
+    document.getElementById('goldLetterDisplay').innerText = `الذهبي: ${char} 💎`;
+    renderGrid();
+  }
+
+  window.startGame = function(mode, param) {
+    document.getElementById('mainMenuView').classList.add('hidden');
+    document.getElementById('gamePlayView').classList.remove('hidden');
+    renderGrid();
+    startTimer();
+  };
+
+  window.startOnlineGame = function() {
+    if (window.connectOnlineMatch) {
+      window.connectOnlineMatch();
+    } else {
+      window.startGame('online', 2);
+    }
+  };
+
+  window.exitToMenu = function() {
+    clearInterval(timerInterval);
+    document.getElementById('gamePlayView').classList.add('hidden');
+    document.getElementById('mainMenuView').classList.round = '';
+    document.getElementById('mainMenuView').classList.remove('hidden');
+  };
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerVal = 20;
+    document.getElementById('timerDisplay').innerText = timerVal;
+    timerInterval = setInterval(() => {
+      timerVal--;
+      document.getElementById('timerDisplay').innerText = timerVal;
+      if (timerVal <= 0) {
+        timerVal = 20;
+      }
+    }, 1000);
+  }
+
+  window.handleWordSubmit = function() {
+    const val = document.getElementById('answerInput').value;
+    if(val) {
+      alert("تم إرسال الكلمة: " + val);
+      document.getElementById('answerInput').value = '';
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', renderGrid);
+</script>
+</body>
+</html>
