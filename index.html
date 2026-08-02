@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#100b2e">
+<meta name="game-build" content="6.4-online-improvements">
+<title>سباق الحروف 🏆</title>
+<style>
+:root{--bg1:#100b2e;--bg2:#24125f;--txt:#fff;--gold:#ffd700;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  min-height:100%;
+  font-family:Tahoma,Arial,sans-serif;
+  color:var(--txt);
+  text-align:center;
+  background:
+    radial-gradient(circle at 10% 5%,rgba(255,255,255,.18),transparent 26%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  overflow:hidden;
+}
+button,input{font-family:inherit}
+.screen{
+  display:none;
+  width:100%;
+  height:100vh;
+  height:100svh;
+  height:100dvh;
+  min-height:0;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.screen.active{display:flex}
+.logo{font-size:4.2rem;animation:float 2s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+h1{font-size:2.6rem;margin:8px 0 18px;text-shadow:0 8px 22px rgba(0,0,0,.45)}
+.card{width:min(560px,94vw);padding:22px;margin:10px 0;border-radius:28px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);box-shadow:0 18px 45px rgba(0,0,0,.28);backdrop-filter:blur(12px)}
+.btn{border:0;border-radius:18px;padding:15px 21px;margin:6px;font-size:1.05rem;font-weight:900;color:#fff;cursor:pointer;box-shadow:0 8px 0 rgba(0,0,0,.25),0 16px 24px rgba(0,0,0,.2)}
+.btn:active{transform:translateY(5px);box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.green{background:linear-gradient(135deg,#22c55e,#07893f)}
+.yellow{background:linear-gradient(135deg,#facc15,#f97316);color:#1f1600}
+.red{background:linear-gradient(135deg,#ef4444,#991b1b)}
+.blue{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
+.purple{background:linear-gradient(135deg,#8b5cf6,#5b21b6)}
+.dark{background:linear-gradient(135deg,#334155,#0f172a)}
+
+#menu{
+  justify-content:space-evenly;
+  gap:clamp(8px,1.5vh,18px);
+  padding:
+    max(12px,env(safe-area-inset-top))
+    max(14px,env(safe-area-inset-right))
+    max(12px,env(safe-area-inset-bottom))
+    max(14px,env(safe-area-inset-left));
+}
+#menu .logo{font-size:clamp(3.4rem,7vh,5.4rem);line-height:1;margin:0}
+#menu h1{font-size:clamp(2rem,4.1vh,3.3rem);margin:0}
+#menu .card{
+  width:min(700px,90vw);
+  margin:0;
+  padding:clamp(16px,2.5vh,28px);
+  border-radius:28px;
+}
+#menu .card h2{font-size:clamp(1.25rem,2.7vh,2rem);margin:0 0 15px}
+#menu .btn{
+  font-size:clamp(.95rem,1.9vh,1.25rem);
+  padding:clamp(11px,1.6vh,17px) clamp(17px,2.6vw,30px);
+  margin:6px;
+}
+
+#game{
+  justify-content:flex-start;
+  padding:0 max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+  overflow-y:auto;
+  overscroll-behavior:none;
+  -webkit-overflow-scrolling:touch;
+}
+.top{
+  width:100%;
+  max-width:1120px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:10px;
+  align-items:center;
+  padding:9px 10px;
+  background:rgba(0,0,0,.18);
+  border-bottom:1px solid rgba(255,255,255,.14);
+  border-radius:0 0 24px 24px;
+}
+.player{padding:9px 7px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
+.player.on{outline:4px solid var(--gold);box-shadow:0 0 26px rgba(255,215,0,.6)}
+.name{font-weight:900;font-size:1.05rem}
+.hearts{font-size:1.18rem;min-height:22px}
+.score{font-size:1.75rem;font-weight:1000}
+.timer{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.55rem;font-weight:1000;background:rgba(255,255,255,.13);border:5px solid rgba(255,255,255,.25)}
+.timer.danger{animation:pulse .45s infinite}
+@keyframes pulse{50%{transform:scale(1.08);color:#ff5555}}
+.badges{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:6px 0 2px}
+.badge{padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);font-weight:900;font-size:.9rem}
+#msg{width:min(1040px,96vw);min-height:56px;margin:6px auto;padding:12px 14px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900}
+.answerBox{width:min(1040px,96vw);display:flex;gap:10px;margin:4px auto 0;padding:0}
+#answer{flex:1;padding:16px;border-radius:20px;border:2px solid rgba(255,255,255,.25);outline:0;text-align:center;font-size:1.18rem;font-weight:900;background:rgba(255,255,255,.95);color:#222}
+#answer:disabled{opacity:.55}
+.answerBox .btn{margin:0;padding:11px 14px;min-width:72px}
+.grid{width:min(1040px,98vw);display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:8px auto 6px;padding:7px}
+.letter{min-height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.94);color:#222;font-size:1.45rem;font-weight:1000;cursor:pointer;border:3px solid transparent;box-shadow:0 8px 18px rgba(0,0,0,.18)}
+.letter.used{opacity:.17;pointer-events:none}
+.letter.lock{opacity:.48;pointer-events:none}
+.letter.golden{border-color:var(--gold);background:linear-gradient(135deg,#fff7b0,#ffc400);box-shadow:0 0 24px rgba(255,215,0,.7)}
+#game > .btn.dark{padding:7px 12px;font-size:.8rem;margin:2px auto 0;border-radius:13px}
+#toast{position:fixed;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-130px);z-index:50;padding:13px 18px;border-radius:999px;background:#111827;color:white;font-weight:900;transition:.25s;box-shadow:0 12px 25px rgba(0,0,0,.35)}
+#toast.show{transform:translateX(-50%) translateY(0)}
+.shake{animation:shake .25s}
+@keyframes shake{25%{transform:translateX(8px)}50%{transform:translateX(-8px)}75%{transform:translateX(6px)}}
+.fire{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.spark{position:absolute;width:8px;height:8px;border-radius:50%;animation:boom 1.1s linear forwards}
+@keyframes boom{to{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}}
+
+@media(min-width:900px){
+  .letter{min-height:62px;font-size:1.55rem}
+  .grid{gap:9px}
+}
+@media(max-width:700px){
+  #menu{padding:8px;gap:7px}
+  #menu .logo{font-size:3rem}
+  #menu h1{font-size:1.8rem}
+  #menu .card{width:96vw;padding:14px}
+  #menu .card h2{font-size:1.15rem;margin-bottom:10px}
+  #menu .btn{font-size:.9rem;padding:10px 12px;margin:4px}
+
+  #game{padding:0 6px max(6px,env(safe-area-inset-bottom))}
+  .top{grid-template-columns:1fr 70px 1fr;gap:6px;padding:7px 6px}
+  .player{padding:6px 4px;border-radius:16px}
+  .name{font-size:.82rem}
+  .hearts{font-size:.82rem;min-height:17px}
+  .score{font-size:1.35rem}
+  .timer{width:64px;height:64px;font-size:1.85rem}
+  .badges{gap:6px;margin:5px 0 1px}
+  .badge{padding:5px 9px;font-size:.78rem}
+  #msg{width:98vw;min-height:48px;margin:5px auto;padding:9px 10px;font-size:.9rem;border-radius:17px}
+  .answerBox{width:98vw;gap:7px}
+  #answer{padding:12px;font-size:1rem;border-radius:17px}
+  .answerBox .btn{padding:9px 10px;min-width:60px;border-radius:14px}
+  .grid{width:98vw;grid-template-columns:repeat(7,1fr);gap:6px;margin:6px auto 4px;padding:5px}
+  .letter{min-height:46px;font-size:1.12rem;border-radius:13px}
+  #game > .btn.dark{padding:6px 10px;font-size:.72rem}
+}
+@media(min-width:701px) and (max-height:900px){
+  #menu .logo{font-size:3.5rem}
+  #menu h1{font-size:2rem}
+  #menu .card{padding:14px 20px}
+  #menu .card h2{margin-bottom:10px}
+  #menu .btn{padding:10px 16px}
+  .top{padding:7px 8px}
+  .timer{width:76px;height:76px;font-size:2.2rem}
+  #msg{min-height:48px;margin:4px auto;padding:9px 12px}
+  #answer{padding:13px}
+  .grid{margin:5px auto 4px;gap:7px}
+  .letter{min-height:50px;font-size:1.3rem}
+}
+@media(orientation:landscape) and (max-height:700px){
+  #menu{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto 1fr;
+    gap:10px;
+    align-content:center;
+  }
+  #menu .logo{grid-column:1/3;font-size:2.6rem}
+  #menu h1{grid-column:1/3;font-size:1.7rem}
+  #menu .card{width:100%;padding:12px}
+  #menu .card h2{font-size:1.1rem;margin-bottom:8px}
+  #menu .btn{padding:9px 12px;font-size:.85rem;margin:4px}
+}
+
+.profileBar{width:min(700px,90vw);display:flex;justify-content:space-between;align-items:center;padding:11px 18px;border-radius:18px;font-size:1.05rem;font-weight:900;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);box-shadow:0 10px 28px rgba(0,0,0,.2)}
+.menuActions{width:min(700px,90vw);display:flex;justify-content:center;flex-wrap:wrap;gap:7px}.menuActions .btn{margin:0}
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(4,3,18,.78);backdrop-filter:blur(10px)}
+.modal.show{display:flex}.modalCard{width:min(520px,94vw);padding:25px;border-radius:28px;background:linear-gradient(145deg,rgba(46,28,108,.98),rgba(20,13,56,.98));border:1px solid rgba(255,255,255,.2);box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.modalCard h2{margin:5px 0 12px}.modalCard p{opacity:.9;line-height:1.7}.modalIcon{font-size:3.7rem}
+.modalInput{width:100%;padding:16px;margin:10px 0 12px;border:0;outline:0;border-radius:18px;text-align:center;font-size:1.15rem;font-weight:900}
+.statsGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0}
+.statBox{min-height:95px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:12px;border-radius:18px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.14)}
+.statBox strong{font-size:1.55rem}.aboutText{margin:18px 0 8px;line-height:1.8;opacity:.9}
+@media(max-width:700px){.profileBar{width:96vw;padding:9px 13px;font-size:.9rem}.menuActions{width:96vw}.menuActions .btn{font-size:.8rem;padding:9px 11px}.modalCard{padding:19px}.statsGrid{gap:7px}.statBox{min-height:82px;font-size:.85rem}}
+
+
+/* إصلاح إدخال الاسم على iPad وSafari */
+.modal,
+.modalCard,
+.modalInput{
+  pointer-events:auto;
+}
+.modalCard{
+  position:relative;
+  z-index:102;
+}
+.modalInput{
+  position:relative;
+  z-index:103;
+  display:block;
+  min-height:56px;
+  color:#111;
+  background:#fff;
+  opacity:1;
+  -webkit-user-select:text;
+  user-select:text;
+  touch-action:manipulation;
+  cursor:text;
+}
+.modalInput:focus{
+  outline:4px solid rgba(255,215,0,.55);
+  box-shadow:0 0 0 5px rgba(255,255,255,.12);
+}
+
+
+.profilePanel{
+  width:min(700px,90vw);
+  padding:11px 16px 13px;
+  border-radius:20px;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 10px 28px rgba(0,0,0,.2);
+}
+.profilePanel .profileBar{
+  width:100%;
+  padding:0;
+  border:0;
+  box-shadow:none;
+  background:transparent;
+}
+.levelRow{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:9px;
+  font-size:.86rem;
+  font-weight:900;
+}
+.xpTrack{
+  width:100%;
+  height:13px;
+  margin-top:7px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(0,0,0,.32);
+  border:1px solid rgba(255,255,255,.16);
+}
+.xpFill{
+  width:0%;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#facc15,#f97316);
+  transition:width .45s ease;
+  box-shadow:0 0 13px rgba(250,204,21,.55);
+}
+.rankText{
+  margin-top:7px;
+  font-size:.88rem;
+  font-weight:900;
+}
+.levelUpCard{
+  animation:levelPop .45s ease both;
+}
+.levelUpIcon{
+  font-size:4.5rem;
+  animation:levelBounce .8s ease-in-out infinite alternate;
+}
+.newLevelText{
+  margin:14px 0 8px;
+  font-size:1.4rem;
+  font-weight:1000;
+  color:#ffe45e;
+}
+.newRankText{
+  margin-bottom:14px;
+  font-size:1.1rem;
+  font-weight:900;
+}
+@keyframes levelPop{
+  from{transform:scale(.65);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+@keyframes levelBounce{
+  to{transform:translateY(-9px) rotate(5deg)}
+}
+@media(max-width:700px){
+  .profilePanel{width:96vw;padding:9px 12px 11px}
+  .levelRow{font-size:.74rem}
+  .rankText{font-size:.78rem}
+  .xpTrack{height:11px}
+}
+
+
+/* ===== إصدار 5.2: تحسين الخبرة والرتبة والترقية ===== */
+.profilePanel{
+  position:relative;
+  overflow:hidden;
+}
+.profilePanel::before{
+  content:"";
+  position:absolute;
+  inset:-40% auto auto -20%;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,215,0,.12),transparent 70%);
+  pointer-events:none;
+}
+.xpTrack{
+  position:relative;
+  height:15px;
+  overflow:hidden;
+}
+.xpTrack::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.25) 45%,transparent 65%);
+  transform:translateX(-130%);
+  animation:xpShine 3.1s ease-in-out infinite;
+  pointer-events:none;
+}
+.xpFill{
+  position:relative;
+  min-width:0;
+  background:linear-gradient(90deg,#facc15,#fb923c,#facc15);
+  background-size:220% 100%;
+  transition:width .8s cubic-bezier(.2,.9,.2,1);
+  animation:xpFlow 2.4s linear infinite;
+}
+.rankBadgeWrap{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin-top:9px;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(255,215,0,.12);
+  border:1px solid rgba(255,215,0,.35);
+  box-shadow:0 0 18px rgba(255,215,0,.12);
+}
+.rankLabel{
+  font-size:.72rem;
+  opacity:.72;
+}
+.rankText{
+  margin:0;
+  color:#ffe57a;
+  text-shadow:0 0 12px rgba(255,215,0,.35);
+}
+.levelUpCard{
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(255,215,0,.45);
+  box-shadow:0 0 0 1px rgba(255,215,0,.12),0 25px 75px rgba(0,0,0,.55),0 0 45px rgba(255,215,0,.14);
+}
+.levelGlow{
+  position:absolute;
+  width:260px;
+  height:260px;
+  left:50%;
+  top:16%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,215,0,.28),transparent 68%);
+  animation:levelGlowPulse 1.2s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+.levelReward{
+  width:max-content;
+  max-width:100%;
+  margin:10px auto 12px;
+  padding:8px 13px;
+  border-radius:999px;
+  font-weight:900;
+  background:rgba(34,197,94,.15);
+  border:1px solid rgba(34,197,94,.4);
+}
+@keyframes xpShine{
+  0%,35%{transform:translateX(-140%)}
+  70%,100%{transform:translateX(140%)}
+}
+@keyframes xpFlow{
+  to{background-position:220% 0}
+}
+@keyframes levelGlowPulse{
+  to{transform:translate(-50%,-50%) scale(1.18);opacity:.72}
+}
+@media(max-width:700px){
+  .rankBadgeWrap{padding:5px 10px;gap:6px}
+  .rankLabel{font-size:.66rem}
+  .levelReward{font-size:.82rem}
+}
+
+
+.achievementsCard{width:min(650px,96vw);max-height:88dvh;overflow-y:auto}
+.achievementsIntro{margin:0 0 14px;opacity:.82}
+.achievementsList{display:grid;gap:10px;margin:14px 0 18px;text-align:right}
+.achievementItem{position:relative;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding:14px;border-radius:19px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14)}
+.achievementItem.done{background:linear-gradient(135deg,rgba(255,215,0,.19),rgba(249,115,22,.12));border-color:rgba(255,215,0,.55);box-shadow:0 0 22px rgba(255,215,0,.12)}
+.achievementIcon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:15px;font-size:1.55rem;background:rgba(0,0,0,.22)}
+.achievementTitle{font-weight:1000;margin-bottom:5px}.achievementDesc{font-size:.84rem;opacity:.78;line-height:1.5}
+.achievementProgress{margin-top:8px}.achievementProgressText{display:flex;justify-content:space-between;gap:8px;font-size:.76rem;font-weight:900}
+.achievementTrack{height:8px;margin-top:5px;overflow:hidden;border-radius:999px;background:rgba(0,0,0,.28)}
+.achievementFill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#22c55e,#facc15)}
+.achievementRewardSmall{margin-top:7px;font-size:.75rem;color:#ffe57a;font-weight:900}
+.achievementCheck{position:absolute;top:9px;left:10px;font-size:1.15rem}
+.achievementUnlockCard{animation:achievementPop .45s ease both;border-color:rgba(255,215,0,.55)}
+.achievementBurst{font-size:4.5rem;animation:achievementBounce .75s ease-in-out infinite alternate}
+.unlockedAchievementName{margin:14px 0 10px;font-size:1.45rem;font-weight:1000;color:#ffe45e}
+.unlockedAchievementReward{width:max-content;max-width:100%;margin:0 auto 15px;padding:9px 14px;border-radius:999px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.4);font-weight:900}
+@keyframes achievementPop{from{transform:scale(.65);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes achievementBounce{to{transform:translateY(-9px) rotate(5deg)}}
+@media(max-width:700px){.achievementItem{padding:11px;gap:9px}.achievementIcon{width:42px;height:42px;font-size:1.35rem}.achievementTitle{font-size:.9rem}.achievementDesc{font-size:.75rem}}
+
+/* ===== إصلاح 5.4.1: ترتيب أرقام الإنجازات ===== */
+.progressNumbers{
+  direction:ltr;
+  unicode-bidi:isolate;
+  display:inline-block;
+  min-width:58px;
+  text-align:left;
+  font-variant-numeric:tabular-nums;
+}
+.achievementItem:not(.done){
+  filter:saturate(.88);
+}
+.achievementItem.done .achievementTitle{
+  color:#ffe57a;
+}
+.achievementItem.done .achievementFill{
+  width:100% !important;
+  background:linear-gradient(90deg,#facc15,#f97316);
+}
+
+
+/* ===== إصدار 5.4.2: الإنجازات النهائية ===== */
+.achievementItem{
+  grid-template-columns:52px minmax(0,1fr);
+}
+.achievementContent{
+  min-width:0;
+}
+.achievementItem.locked{
+  opacity:.78;
+  filter:saturate(.75);
+}
+.achievementItem.ready{
+  opacity:1;
+  background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(249,115,22,.13));
+  border-color:rgba(255,215,0,.65);
+  box-shadow:0 0 24px rgba(255,215,0,.15);
+}
+.achievementItem.claimed{
+  opacity:1;
+  background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(255,215,0,.11));
+  border-color:rgba(34,197,94,.45);
+}
+.achievementItem.ready .achievementTitle{
+  color:#ffe56f;
+}
+.achievementItem.claimed .achievementTitle{
+  color:#86efac;
+}
+.progressFraction{
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  display:inline-flex !important;
+  flex-direction:row !important;
+  align-items:center;
+  justify-content:flex-start;
+  gap:5px;
+  min-width:72px;
+  white-space:nowrap;
+  text-align:left;
+  font-family:Tahoma,Arial,sans-serif;
+  font-variant-numeric:tabular-nums;
+}
+.progressSlash{
+  opacity:.65;
+}
+.claimRewardBtn{
+  width:100%;
+  margin-top:10px;
+  padding:10px 12px;
+  border:0;
+  border-radius:13px;
+  color:#211600;
+  background:linear-gradient(135deg,#fde047,#f59e0b);
+  font-family:inherit;
+  font-size:.85rem;
+  font-weight:1000;
+  cursor:pointer;
+  box-shadow:0 6px 0 rgba(120,70,0,.35);
+}
+.claimRewardBtn:active{
+  transform:translateY(3px);
+  box-shadow:0 3px 0 rgba(120,70,0,.35);
+}
+.claimedBtn{
+  color:#e5e7eb;
+  background:rgba(34,197,94,.22);
+  border:1px solid rgba(34,197,94,.38);
+  box-shadow:none;
+  cursor:default;
+}
+@media(max-width:700px){
+  .achievementItem{
+    grid-template-columns:44px minmax(0,1fr);
+  }
+  .progressFraction{
+    min-width:62px;
+    gap:4px;
+  }
+  .claimRewardBtn{
+    font-size:.78rem;
+    padding:9px 10px;
+  }
+}
+
+
+/* ===== إصدار 6.0 التجريبي: اللعب أونلاين ===== */
+.onlineMainCard{border-color:rgba(59,130,246,.4)}
+.onlineHint{margin:-4px 0 12px;opacity:.78}
+.onlineLobbyCard{width:min(560px,95vw)}
+.onlineSub{line-height:1.7;opacity:.85}
+.onlineWideBtn{width:min(330px,90%);margin:7px auto}
+.onlineDivider{display:flex;align-items:center;gap:12px;margin:15px 0;color:rgba(255,255,255,.65)}
+.onlineDivider::before,.onlineDivider::after{content:"";height:1px;flex:1;background:rgba(255,255,255,.18)}
+.roomCodeInput{direction:ltr;letter-spacing:8px;font-size:1.4rem}
+.onlineStatusBox{margin:16px 0;padding:14px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
+.roomCodeView{display:grid;gap:7px;justify-items:center;margin-top:12px}
+.roomCodeView strong{direction:ltr;font-size:2rem;letter-spacing:8px;color:#ffe56f}
+.copyCodeBtn{border:0;border-radius:11px;padding:8px 13px;font-family:inherit;font-weight:900;cursor:pointer}
+.onlinePlayers{display:grid;gap:8px;margin-top:12px}
+.onlinePlayerRow{padding:9px 12px;border-radius:13px;background:rgba(0,0,0,.18);font-weight:900}
+.onlineBadge{position:fixed;z-index:20;bottom:max(8px,env(safe-area-inset-bottom));left:10px;padding:7px 11px;border-radius:999px;background:#111827;border:1px solid rgba(255,255,255,.2);font-size:.75rem;font-weight:900}
+@media(max-width:700px){.roomCodeView strong{font-size:1.65rem}.onlineLobbyCard{padding:18px}}
+
+
+/* ===== إصدار 6.4: تحسينات الأونلاين ===== */
+.onlineSpinner{
+  width:38px;
+  height:38px;
+  margin:12px auto;
+  border-radius:50%;
+  border:4px solid rgba(255,255,255,.2);
+  border-top-color:#60a5fa;
+  animation:onlineSpin .8s linear infinite;
+}
+@keyframes onlineSpin{to{transform:rotate(360deg)}}
+
+#connectionNotice{
+  position:fixed;
+  z-index:160;
+  top:max(12px,env(safe-area-inset-top));
+  left:50%;
+  transform:translate(-50%,-140px);
+  width:min(540px,92vw);
+  padding:13px 16px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#991b1b,#ef4444);
+  border:1px solid rgba(255,255,255,.3);
+  box-shadow:0 14px 35px rgba(0,0,0,.4);
+  font-weight:1000;
+  transition:transform .3s ease;
+}
+#connectionNotice.show{transform:translate(-50%,0)}
+.rematchWaiting{
+  margin:12px auto;
+  padding:10px 13px;
+  border-radius:14px;
+  background:rgba(59,130,246,.18);
+  border:1px solid rgba(96,165,250,.4);
+  font-weight:900;
+}
+
+</style>
+</head>
+<body>
+<div id="toast"></div><div id="connectionNotice">⚠️ انقطع اتصال اللاعب الآخر</div><div id="onlineBadge" class="onlineBadge" hidden>🌐 متصل</div>
+
+<section id="menu" class="screen active">
+  <div class="logo">🏆</div>
+  <h1>سباق الحروف</h1>
+  <div class="profilePanel">
+    <div class="profileBar">
+      <div>👤 <span id="profileName">لاعب</span></div>
+      <div>🪙 <span id="coinCount">0</span></div>
+    </div>
+    <div class="levelRow">
+      <span id="levelText">⭐ المستوى 1</span>
+      <span id="xpText">0 / 100 خبرة</span>
+    </div>
+    <div class="xpTrack"><div id="xpFill" class="xpFill"></div></div>
+    <div class="rankBadgeWrap"><span class="rankLabel">الرتبة</span><span id="rankText" class="rankText">🌱 مبتدئ</span></div>
+  </div>
+  <div class="card">
+    <h2>👤 ضد روبو 🤖</h2>
+    <button class="btn green" onclick="startGame('ai','easy')">سهل 🟢</button>
+    <button class="btn yellow" onclick="startGame('ai','normal')">متوسط 🟡</button>
+    <button class="btn red" onclick="startGame('ai','hard')">صعب 🔴</button>
+  </div>
+  <div class="card onlineMainCard">
+    <h2>🌐 العب مع صديق</h2>
+    <p class="onlineHint">كل لاعب من جهاز مختلف</p>
+    <button class="btn blue" onclick="openOnlineLobby()">إنشاء أو دخول غرفة</button>
+  </div>
+  <div class="menuActions">
+    <button class="btn dark" onclick="openStats()">📊 الإحصائيات</button>
+    <button class="btn purple" onclick="openAchievements()">🏅 الإنجازات</button>
+    <button class="btn dark" onclick="openSettings()">⚙️ الإعدادات</button>
+  </div>
+</section>
+
+
+
+<div id="onlineLobbyModal" class="modal">
+  <div class="modalCard onlineLobbyCard">
+    <h2>🌐 اللعب أونلاين</h2>
+    <p class="onlineSub">أنشئ غرفة وأرسل الكود لصديقك، أو أدخل كود غرفة موجودة.</p>
+
+    <button id="createRoomBtn" class="btn green onlineWideBtn" onclick="createOnlineRoom()">➕ إنشاء غرفة</button>
+
+    <div class="onlineDivider"><span>أو</span></div>
+
+    <input id="roomCodeInput" class="modalInput roomCodeInput" inputmode="numeric" maxlength="6" placeholder="أدخل كود الغرفة">
+    <button id="joinRoomBtn" class="btn blue onlineWideBtn" onclick="joinOnlineRoom()">🔑 دخول الغرفة</button>
+
+    <div id="onlineStatusBox" class="onlineStatusBox" hidden>
+      <div id="onlineSpinner" class="onlineSpinner" hidden></div><div id="onlineStatusText">جاري الاتصال...</div>
+      <div id="roomCodeView" class="roomCodeView" hidden>
+        <span>كود الغرفة</span>
+        <strong id="roomCodeText">000000</strong>
+        <button class="copyCodeBtn" onclick="copyOnlineRoomCode()">نسخ الكود</button>
+      </div>
+      <div id="onlinePlayers" class="onlinePlayers"></div>
+    </div>
+
+    <button class="btn dark" onclick="closeOnlineLobby()">إغلاق</button>
+  </div>
+</div>
+
+<div id="welcomeModal" class="modal">
+  <div class="modalCard">
+    <div class="modalIcon">👋</div>
+    <h2>أهلًا بك في سباق الحروف</h2>
+    <p>اكتب اسمك ليتم حفظ تقدمك تلقائيًا.</p>
+    <input id="nameInput" class="modalInput" type="text" inputmode="text" maxlength="18" placeholder="اكتب اسمك هنا" autocomplete="name" autocapitalize="words" onclick="focusNameInput()" ontouchend="focusNameInput()">
+    <button class="btn green" onclick="savePlayerName()">ابدأ اللعب ▶️</button>
+  </div>
+</div>
+<div id="statsModal" class="modal">
+  <div class="modalCard">
+    <h2>📊 إحصائياتي</h2>
+    <div class="statsGrid">
+      <div class="statBox"><span>🎮 المباريات</span><strong id="statGames">0</strong></div>
+      <div class="statBox"><span>🥇 الانتصارات</span><strong id="statWins">0</strong></div>
+      <div class="statBox"><span>📈 نسبة الفوز</span><strong id="statRate">0%</strong></div>
+      <div class="statBox"><span>💎 الحروف الذهبية</span><strong id="statGolden">0</strong></div>
+      <div class="statBox"><span>⭐ أعلى نتيجة</span><strong id="statHigh">0</strong></div>
+      <div class="statBox"><span>⭐ المستوى</span><strong id="statLevel">1</strong></div>
+      <div class="statBox"><span>✨ الخبرة</span><strong id="statXP">0 / 100</strong></div>
+    </div>
+    <button class="btn dark" onclick="closeModal('statsModal')">إغلاق</button>
+  </div>
+</div>
+
+
+<div id="achievementsModal" class="modal">
+  <div class="modalCard achievementsCard">
+    <h2>🏅 الإنجازات</h2>
+    <p class="achievementsIntro">أكمل التحديات لتحصل على عملات وخبرة.</p>
+    <div id="achievementsList" class="achievementsList"></div>
+    <button class="btn dark" onclick="closeModal('achievementsModal')">إغلاق</button>
+  </div>
+</div>
+<div id="achievementUnlockModal" class="modal">
+  <div class="modalCard achievementUnlockCard">
+    <div class="achievementBurst">🎉</div>
+    <h2>تم استلام المكافأة!</h2>
+    <div id="unlockedAchievementName" class="unlockedAchievementName">🏅 أول فوز</div>
+    <div id="unlockedAchievementReward" class="unlockedAchievementReward">+50 🪙 و +100 خبرة</div>
+    <button class="btn green" onclick="closeAchievementReward()">رائع! 🏆</button>
+  </div>
+</div>
+<div id="levelUpModal" class="modal">
+  <div class="modalCard levelUpCard">
+    <div class="levelUpIcon">🎉</div>
+    <h2>ترقية جديدة!</h2>
+    <div class="levelGlow"></div>
+    <div id="newLevelText" class="newLevelText">أصبحت في المستوى 2</div>
+    <div class="levelReward">🎁 مكافأة ترقية: +25 🪙</div>
+    <div id="newRankText" class="newRankText">🌱 مبتدئ</div>
+    <button class="btn green" onclick="closeModal('levelUpModal')">رائع! ⭐</button>
+  </div>
+</div>
+
+<div id="settingsModal" class="modal">
+  <div class="modalCard">
+    <h2>⚙️ الإعدادات</h2>
+    <button id="soundBtn" class="btn blue" onclick="toggleSound()">🔊 الصوت: يعمل</button>
+    <button class="btn purple" onclick="changePlayerName()">✏️ تغيير الاسم</button>
+    <div class="aboutText">🏆 سباق الحروف<br><small>الإصدار 6.4 أونلاين</small></div>
+    <button class="btn dark" onclick="closeModal('settingsModal')">إغلاق</button>
+  </div>
+</div>
+
+<section id="game" class="screen">
+  <div class="top">
+    <div id="p1Card" class="player"><div id="p1Name" class="name">اللاعب 1</div><div id="p1H" class="hearts">❤️❤️❤️</div><div id="p1S" class="score">0</div></div>
+    <div id="timer" class="timer">15</div>
+    <div id="p2Card" class="player"><div id="p2Name" class="name">روبو 🤖</div><div id="p2H" class="hearts">❤️❤️❤️</div><div id="p2S" class="score">0</div></div>
+  </div>
+  <div id="p3Area" style="display:none;width:100%;padding:8px 10px;background:rgba(0,0,0,.12)">
+    <div id="p3Card" class="player" style="width:min(300px,90vw);margin:auto"><div class="name">اللاعب 3</div><div id="p3H" class="hearts">❤️❤️❤️</div><div id="p3S" class="score">0</div></div>
+  </div>
+  <div class="badges"><span id="roundBadge" class="badge">الجولة 1</span><span id="goldBadge" class="badge">💎 الذهبي: ؟</span></div>
+  <div id="msg">اختر حرفاً</div>
+  <div class="answerBox"><input id="answer" placeholder="اكتب الإجابة هنا..." disabled autocomplete="off"><button class="btn green" onclick="submitAnswer()">✅</button></div>
+  <div id="letters" class="grid"></div>
+  <button class="btn dark" onclick="backMenu()">🔄 خروج للقائمة</button>
+</section>
+
+<section id="end" class="screen">
+  <div class="fire" id="fire"></div>
+  <div class="logo">👑</div>
+  <h1 id="winnerText">الفائز</h1>
+  <div class="card"><h2 id="finalScore"></h2><button class="btn green" onclick="restart()">إعادة اللعب</button><button class="btn dark" onclick="backMenu()">القائمة</button></div>
+</section>
+
+<script src="dictionary.js"></script>
+<script>
+const letters="أبتثجحخدذرزسشصضطظعغفقكلمنهوي".split("");
+
+let state={},timerId=null,audio=null;
+const SAVE_KEY="sibaqPlayerV5";
+let playerData={name:"",coins:0,games:0,wins:0,golden:0,highScore:0,sound:true,level:1,xp:0,correctAnswers:0,perfectWins:0,achievements:{}};
+
+
+
+
+const ACHIEVEMENTS=[
+  {id:"firstWin",icon:"🏅",title:"أول فوز",desc:"اربح أول مباراة.",target:1,rewardCoins:50,rewardXP:100,progress:()=>playerData.wins||0},
+  {id:"tenWins",icon:"🏆",title:"10 انتصارات",desc:"اربح 10 مباريات.",target:10,rewardCoins:150,rewardXP:250,progress:()=>playerData.wins||0},
+  {id:"hundredCorrect",icon:"✅",title:"100 إجابة صحيحة",desc:"أجب 100 إجابة صحيحة.",target:100,rewardCoins:250,rewardXP:400,progress:()=>playerData.correctAnswers||0},
+  {id:"twentyGolden",icon:"💎",title:"جمع 20 حرفًا ذهبيًا",desc:"أجب بشكل صحيح على 20 حرفًا ذهبيًا.",target:20,rewardCoins:200,rewardXP:300,progress:()=>playerData.golden||0},
+  {id:"levelTen",icon:"⭐",title:"الوصول إلى المستوى 10",desc:"ارفع حسابك إلى المستوى 10.",target:10,rewardCoins:300,rewardXP:500,progress:()=>playerData.level||1},
+  {id:"perfectWin",icon:"❤️",title:"الفوز دون خسارة أي قلب",desc:"اربح مباراة كاملة دون خسارة أي قلب.",target:1,rewardCoins:100,rewardXP:150,progress:()=>playerData.perfectWins||0}
+];
+
+function ensureAchievementData(){
+  if(!playerData.achievements || typeof playerData.achievements!=="object"){
+    playerData.achievements={};
+  }
+
+  /* ترحيل بيانات الإصدار السابق:
+     القيمة true تعني أن المكافأة أُضيفت تلقائيًا سابقًا،
+     لذلك تُسجل كمفتوحة ومستلمة لمنع تكرار المكافأة.
+  */
+  Object.keys(playerData.achievements).forEach(id=>{
+    const oldValue=playerData.achievements[id];
+    if(oldValue===true){
+      playerData.achievements[id]={unlocked:true,claimed:true};
+    }else if(!oldValue || typeof oldValue!=="object"){
+      playerData.achievements[id]={unlocked:false,claimed:false};
+    }else{
+      playerData.achievements[id]={
+        unlocked:!!oldValue.unlocked,
+        claimed:!!oldValue.claimed
+      };
+    }
+  });
+
+  if(typeof playerData.correctAnswers!=="number")playerData.correctAnswers=0;
+  if(typeof playerData.perfectWins!=="number")playerData.perfectWins=0;
+}
+
+function achievementState(id){
+  ensureAchievementData();
+  if(!playerData.achievements[id]){
+    playerData.achievements[id]={unlocked:false,claimed:false};
+  }
+  return playerData.achievements[id];
+}
+
+function checkAchievements(){
+  ensureAchievementData();
+  let changed=false;
+  let newlyUnlocked=0;
+
+  ACHIEVEMENTS.forEach(a=>{
+    const status=achievementState(a.id);
+    if(!status.unlocked && a.progress()>=a.target){
+      status.unlocked=true;
+      changed=true;
+      newlyUnlocked++;
+    }
+  });
+
+  if(changed)savePlayer();
+  if(newlyUnlocked>0)toast("🎁 لديك إنجاز جاهز للاستلام");
+  renderAchievements();
+}
+
+function openAchievements(){
+  checkAchievements();
+  renderAchievements();
+  document.getElementById("achievementsModal").classList.add("show");
+}
+
+function progressFraction(current,target){
+  return `
+    <span class="progressFraction" dir="ltr">
+      <span>${current}</span>
+      <span class="progressSlash">/</span>
+      <span>${target}</span>
+    </span>
+  `;
+}
+
+function renderAchievements(){
+  const box=document.getElementById("achievementsList");
+  if(!box)return;
+
+  ensureAchievementData();
+  box.innerHTML="";
+
+  ACHIEVEMENTS.forEach(a=>{
+    const current=Math.min(a.target,Math.max(0,a.progress()));
+    const percent=Math.min(100,(current/a.target)*100);
+    const status=achievementState(a.id);
+    const stateClass=status.claimed?"claimed":status.unlocked?"ready":"locked";
+    const stateLabel=status.claimed?"تم الاستلام ✅":status.unlocked?"جاهز للاستلام 🎁":"قيد التنفيذ";
+
+    let action="";
+    if(status.unlocked && !status.claimed){
+      action=`<button class="claimRewardBtn" onclick="claimAchievement('${a.id}')">🎁 استلام المكافأة</button>`;
+    }else if(status.claimed){
+      action='<button class="claimRewardBtn claimedBtn" disabled>✅ تم الاستلام</button>';
+    }
+
+    const item=document.createElement("div");
+    item.className="achievementItem "+stateClass;
+    item.innerHTML=`
+      <div class="achievementIcon">${a.icon}</div>
+      <div class="achievementContent">
+        <div class="achievementTitle">${a.title}</div>
+        <div class="achievementDesc">${a.desc}</div>
+
+        <div class="achievementProgress">
+          <div class="achievementProgressText">
+            <span>${stateLabel}</span>
+            ${progressFraction(current,a.target)}
+          </div>
+          <div class="achievementTrack">
+            <div class="achievementFill" style="width:${percent}%"></div>
+          </div>
+        </div>
+
+        <div class="achievementRewardSmall">
+          المكافأة: ${a.rewardCoins} 🪙 و ${a.rewardXP} خبرة
+        </div>
+        ${action}
+      </div>
+    `;
+    box.appendChild(item);
+  });
+}
+
+function claimAchievement(id){
+  const a=ACHIEVEMENTS.find(item=>item.id===id);
+  if(!a)return;
+
+  const status=achievementState(id);
+  if(!status.unlocked || status.claimed)return;
+
+  /* نسجل الاستلام قبل الحفظ لمنع الضغط المكرر. */
+  status.claimed=true;
+  playerData.coins=(playerData.coins||0)+a.rewardCoins;
+
+  /* إضافة الخبرة بدون فتح نافذة ترقية ثانية فوق نافذة الإنجاز. */
+  playerData.xp=(playerData.xp||0)+a.rewardXP;
+  let levelsGained=0;
+  while(playerData.xp>=xpNeeded(playerData.level||1)){
+    playerData.xp-=xpNeeded(playerData.level||1);
+    playerData.level=(playerData.level||1)+1;
+    playerData.coins=(playerData.coins||0)+25;
+    levelsGained++;
+  }
+
+  savePlayer();
+  renderAchievements();
+
+  document.getElementById("unlockedAchievementName").textContent=a.icon+" "+a.title;
+  let rewardText="+"+a.rewardCoins+" 🪙 و +"+a.rewardXP+" خبرة";
+  if(levelsGained>0){
+    rewardText+=" • وصلت إلى المستوى "+playerData.level;
+  }
+  document.getElementById("unlockedAchievementReward").textContent=rewardText;
+
+  document.getElementById("achievementsModal").classList.remove("show");
+  document.getElementById("achievementUnlockModal").classList.add("show");
+
+  beep(1320,"triangle",.2,.14);
+  setTimeout(()=>beep(1640,"triangle",.25,.12),170);
+  try{navigator.vibrate?.([90,45,130])}catch(e){}
+}
+
+function closeAchievementReward(){
+  document.getElementById("achievementUnlockModal").classList.remove("show");
+  updateProfileUI();
+  checkAchievements();
+}
+
+
+function animateXPBar(percent){
+  const fill=document.getElementById("xpFill");
+  if(!fill)return;
+  const current=parseFloat(fill.dataset.percent||"0");
+  fill.style.width=current+"%";
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      fill.style.width=Math.max(0,Math.min(100,percent))+"%";
+      fill.dataset.percent=String(Math.max(0,Math.min(100,percent)));
+    });
+  });
+}
+
+function xpNeeded(level){
+  return 100 + Math.max(0,level-1)*25;
+}
+function playerRank(level){
+  if(level>=50)return "👑 ملك الحروف";
+  if(level>=35)return "💎 أسطورة";
+  if(level>=20)return "🥇 خبير";
+  if(level>=10)return "🥈 محترف";
+  if(level>=5)return "🥉 هاوي";
+  return "🌱 مبتدئ";
+}
+function addXP(amount,reason=""){
+  const oldLevel=playerData.level||1;
+  playerData.xp=(playerData.xp||0)+amount;
+  let leveled=false;
+  while(playerData.xp>=xpNeeded(playerData.level)){
+    playerData.xp-=xpNeeded(playerData.level);
+    playerData.level++;
+    playerData.coins=(playerData.coins||0)+25;
+    leveled=true;
+  }
+  savePlayer();
+  if(amount>0)toast("✨ +"+amount+" خبرة"+(reason?" — "+reason:""));
+  if(leveled){
+    document.getElementById("newLevelText").textContent="أصبحت في المستوى "+playerData.level;
+    document.getElementById("newRankText").textContent="رتبتك الآن: "+playerRank(playerData.level);
+    document.getElementById("levelUpModal").classList.add("show");
+    beep(1250,"triangle",.22,.14);
+    setTimeout(()=>beep(1550,"triangle",.25,.12),180);setTimeout(()=>toast("🎁 +25 عملة مكافأة ترقية"),450);
+    try{navigator.vibrate?.([80,50,120])}catch(e){}
+  }
+}
+
+function loadPlayer(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||"null");if(saved)playerData={...playerData,...saved};window.playerData=playerData}catch(e){}ensureAchievementData();updateProfileUI();checkAchievements();if(!playerData.name){document.getElementById("welcomeModal").classList.add("show");setTimeout(focusNameInput,250)}}
+function savePlayer(){localStorage.setItem(SAVE_KEY,JSON.stringify(playerData));updateProfileUI()}
+function updateProfileUI(){
+  document.getElementById("profileName").textContent=playerData.name||"لاعب";
+  document.getElementById("coinCount").textContent=playerData.coins||0;
+  const level=playerData.level||1;
+  const need=xpNeeded(level);
+  const xp=Math.max(0,playerData.xp||0);
+  const levelText=document.getElementById("levelText");
+  const xpText=document.getElementById("xpText");
+  const xpFill=document.getElementById("xpFill");
+  const rankText=document.getElementById("rankText");
+  if(levelText)levelText.textContent="⭐ المستوى "+level;
+  if(xpText)xpText.textContent=xp+" / "+need+" خبرة";
+  if(xpFill)animateXPBar(Math.min(100,(xp/need)*100));
+  if(rankText)rankText.textContent=playerRank(level);const p1Name=document.getElementById("p1Name");if(p1Name)p1Name.textContent=playerData.name||"اللاعب 1";document.getElementById("soundBtn").textContent=playerData.sound?"🔊 الصوت: يعمل":"🔇 الصوت: متوقف"}
+
+function focusNameInput(){
+  const input=document.getElementById("nameInput");
+  if(!input)return;
+  input.removeAttribute("disabled");
+  input.readOnly=false;
+  requestAnimationFrame(()=>{
+    input.focus({preventScroll:true});
+    try{
+      const end=input.value.length;
+      input.setSelectionRange(end,end);
+    }catch(e){}
+  });
+}
+
+function savePlayerName(){const input=document.getElementById("nameInput"),name=(input.value||"").trim();if(!name){toast("اكتب اسمك أولًا");return}playerData.name=name;savePlayer();closeModal("welcomeModal")}
+function changePlayerName(){closeModal("settingsModal");const input=document.getElementById("nameInput");input.value=playerData.name||"";document.getElementById("welcomeModal").classList.add("show");setTimeout(focusNameInput,200)}
+function openStats(){document.getElementById("statGames").textContent=playerData.games;document.getElementById("statWins").textContent=playerData.wins;document.getElementById("statRate").textContent=playerData.games?Math.round(playerData.wins/playerData.games*100)+"%":"0%";document.getElementById("statGolden").textContent=playerData.golden;document.getElementById("statHigh").textContent=playerData.highScore;document.getElementById("statLevel").textContent=playerData.level||1;document.getElementById("statXP").textContent=(playerData.xp||0)+" / "+xpNeeded(playerData.level||1);document.getElementById("statsModal").classList.add("show")}
+function openSettings(){updateProfileUI();document.getElementById("settingsModal").classList.add("show")}
+function closeModal(id){document.getElementById(id).classList.remove("show")}
+function toggleSound(){playerData.sound=!playerData.sound;savePlayer()}
+
+function beep(f=700,t="sine",d=.12,v=.08){if(!playerData.sound)return;try{if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();let o=audio.createOscillator(),g=audio.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,audio.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+d);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+d)}catch(e){}}
+function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");const p1NameEl=document.getElementById("p1Name");
+if(p1NameEl)p1NameEl.textContent=state.mode==="online"?pName("p1"):(playerData.name||"اللاعب 1");
+const p2NameEl=document.getElementById("p2Name");
+if(p2NameEl&&state.mode==="online")p2NameEl.textContent=pName("p2");window.scrollTo(0,0)}
+function toast(t){let el=document.getElementById("toast");el.textContent=t;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),1600)}
+function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+function norm(s){return(s||"").trim().replace(/[إأآا]/g,"أ").replace(/ة/g,"ه").replace(/[ىي]/g,"ي")}
+function getWords(category,letter){
+  const target=norm(letter);
+  return (dictionary[category]||[])
+    .filter(item=>(item.accept||[]).some(l=>norm(l)===target))
+    .map(item=>item.name);
+}
+function categoriesForLetter(letter){
+  return Object.keys(dictionary).filter(cat=>getWords(cat,letter).length>0);
+}
+function chooseCategoryForLetter(letter){
+  let choices=categoriesForLetter(letter);
+  if(!choices.length)return Object.keys(dictionary)[0];
+  const withoutLast=choices.filter(cat=>cat!==state.lastCat);
+  if(withoutLast.length)choices=withoutLast;
+  return rnd(choices);
+}
+function pName(p){
+  if(state.mode==="online"&&window.onlineNames)return window.onlineNames[p]||("اللاعب "+(p==="p1"?"1":"2"));
+  return p==="p1"?(playerData.name||"اللاعب 1"):p==="p2"?(state.mode==="ai"?"روبو 🤖":"اللاعب 2"):"اللاعب 3"
+}
+function players(){return state.count===3?["p1","p2","p3"]:["p1","p2"]}
+function startGame(mode,diff){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||"null");if(saved)playerData={...playerData,...saved}}catch(e){}updateProfileUI();let count=mode==="local3"?3:2,time=diff==="easy"?20:diff==="hard"?8:15;state={mode,diff,count,time,turn:"p1",status:"picking",round:1,golden:rnd(letters),used:{},scores:{p1:0,p2:0,p3:0},lives:{p1:3,p2:3,p3:3},currentL:"",cat:"",lastCat:"",timer:time,msg:"اختر حرفاً"};window.state=state;document.getElementById("p2Name").textContent=mode==="ai"?"روبو 🤖":"اللاعب 2";document.getElementById("p3Area").style.display=count===3?"block":"none";buildLetters();show("game");render()}
+function buildLetters(){let box=document.getElementById("letters");box.innerHTML="";letters.forEach(l=>{let d=document.createElement("div");d.className="letter";d.textContent=l;d.dataset.l=l;d.onclick=()=>pick(l);box.appendChild(d)})}
+function render(){const p1NameEl=document.getElementById("p1Name");
+if(p1NameEl)p1NameEl.textContent=state.mode==="online"?pName("p1"):(playerData.name||"اللاعب 1");
+const p2NameEl=document.getElementById("p2Name");
+if(p2NameEl&&state.mode==="online")p2NameEl.textContent=pName("p2");["p1","p2","p3"].forEach(p=>{document.getElementById(p+"S").textContent=state.scores[p]||0;document.getElementById(p+"H").textContent="❤️".repeat(Math.max(0,state.lives[p]||0))||"💔";let c=document.getElementById(p+"Card");if(c)c.classList.toggle("on",state.turn===p)});let tim=document.getElementById("timer");tim.textContent=state.timer;tim.classList.toggle("danger",state.timer<=5&&state.status==="answering");document.getElementById("roundBadge").textContent="الجولة "+state.round+(state.time===6?" ⚡":"");document.getElementById("goldBadge").textContent="💎 الذهبي: "+state.golden;document.getElementById("msg").textContent=state.msg;let ans=document.getElementById("answer");ans.disabled=state.status!=="answering"||(state.mode==="ai"&&state.turn==="p2")||(state.mode==="online"&&state.turn!==window.onlineSlot);if(state.status==="picking")ans.value="";document.querySelectorAll(".letter").forEach(el=>{let l=el.dataset.l;el.className="letter";if(state.used[l])el.classList.add("used");if(l===state.golden)el.classList.add("golden");if(state.status!=="picking"||(state.mode==="ai"&&state.turn==="p2")||(state.mode==="online"&&state.turn!==window.onlineSlot))el.classList.add("lock")})}
+function pick(l){if(state.mode==="online"){window.onlinePick?.(l);return}if(state.status!=="picking"||state.used[l])return;beep(620,"triangle");state.currentL=l;state.used[l]=true;state.cat=chooseCategoryForLetter(l);state.lastCat=state.cat;state.status="answering";state.timer=state.time;state.msg=pName(state.turn)+" | "+state.cat+" بحرف ("+l+")";render();startTimer();if(state.mode==="ai"&&state.turn==="p2")aiAnswer()}
+function startTimer(){if(state.mode==="online"){window.onlineStartTimer?.();return}clearInterval(timerId);timerId=setInterval(()=>{if(state.status!=="answering"){clearInterval(timerId);return}state.timer--;if(state.timer<=3&&state.timer>0)beep(1200,"sine",.1,.18);if(state.timer<=0){clearInterval(timerId);lose(state.turn,"⏰ انتهى الوقت!");nextTurn()}render()},1000)}
+function submitAnswer(){if(state.mode==="online"){window.onlineSubmitAnswer?.();return}if(state.status!=="answering")return;let v=document.getElementById("answer").value.trim();if(v)check(v,state.turn,false)}
+function check(v,p,isAI){clearInterval(timerId);let words=getWords(state.cat,state.currentL),ok=isAI||words.some(w=>norm(w)===norm(v));if(ok){let pts=state.currentL===state.golden?2:1;state.scores[p]=(state.scores[p]||0)+pts;beep(980);if(p==="p1"){playerData.correctAnswers=(playerData.correctAnswers||0)+1;addXP(10,"إجابة صحيحة");checkAchievements();}if(state.currentL===state.golden){playerData.golden++;playerData.coins+=20;savePlayer();if(p==="p1"){addXP(20,"حرف ذهبي");checkAchievements();}else toast("💎 حرف ذهبي +2");}state.msg=(isAI?"🤖 روبو أجاب: ":"✅ إجابة صحيحة: ")+v}else{lose(p,"❌ الإجابة غير صحيحة أو غير موجودة في القاموس");document.body.classList.add("shake");setTimeout(()=>document.body.classList.remove("shake"),260)}document.getElementById("answer").value="";if(gameOver())return;nextTurn()}
+function lose(p,msg){state.lives[p]=Math.max(0,(state.lives[p]||0)-1);beep(160,"sawtooth",.25,.12);state.msg=msg;toast(msg)}
+function nextTurn(){let ps=players(),i=ps.indexOf(state.turn);state.turn=ps[(i+1)%ps.length];state.status="picking";state.currentL="";state.cat="";state.round++;state.time=state.round%7===0?6:(state.diff==="easy"?20:state.diff==="hard"?8:15);if(state.time===6)toast("⚡ جولة البرق!");state.timer=state.time;state.msg=pName(state.turn)+" اختر حرفاً";if(letters.every(l=>state.used[l])){state.used={};state.golden=rnd(letters);toast("لوحة جديدة")}render();if(state.mode==="ai"&&state.turn==="p2")setTimeout(aiPick,650)}
+function aiPick(){if(state.status!=="picking"||state.turn!=="p2")return;let avail=letters.filter(l=>!state.used[l]&&categoriesForLetter(l).length);let goldenOk=!state.used[state.golden]&&categoriesForLetter(state.golden).length;let l=(state.diff==="hard"&&goldenOk)?state.golden:rnd(avail);if(l)pick(l)}
+function aiAnswer(){let delay=state.diff==="easy"?1800:state.diff==="hard"?600:1100;setTimeout(()=>{if(state.turn!=="p2"||state.status!=="answering")return;let words=getWords(state.cat,state.currentL),ans=words.length?rnd(words):state.currentL+"ـكلمة";if(state.diff==="easy"&&Math.random()<.22){lose("p2","🤖 روبو أخطأ");if(gameOver())return;nextTurn();return}check(ans,"p2",true)},delay)}
+function gameOver(){let alive=players().filter(p=>(state.lives[p]||0)>0);if(alive.length<=1){end(alive[0]||players().sort((a,b)=>state.scores[b]-state.scores[a])[0]);return true}return false}
+function end(w){clearInterval(timerId);const maxScore=Math.max(...players().map(p=>state.scores[p]||0));playerData.games++;playerData.highScore=Math.max(playerData.highScore,maxScore);if(w==="p1"){playerData.wins++;playerData.coins+=50;if((state.lives.p1||0)===3){playerData.coins+=30;playerData.perfectWins=(playerData.perfectWins||0)+1}addXP(100,"فوز")}savePlayer();checkAchievements();show("end");document.getElementById("winnerText").textContent="👑 الفائز: "+pName(w);document.getElementById("finalScore").textContent="P1: "+state.scores.p1+" | P2: "+state.scores.p2+(state.count===3?" | P3: "+state.scores.p3:"");if(w==="p1")toast("🏆 فوز! حصلت على عملات");fireworks()}
+function fireworks(){let box=document.getElementById("fire");box.innerHTML="";for(let i=0;i<90;i++){let s=document.createElement("div");s.className="spark";s.style.left=(20+Math.random()*60)+"%";s.style.top=(20+Math.random()*50)+"%";s.style.background=["#ffd700","#22c55e","#3b82f6","#ef4444","#fff","#f97316"][Math.floor(Math.random()*6)];s.style.setProperty("--x",(Math.random()*400-200)+"px");s.style.setProperty("--y",(Math.random()*400-200)+"px");s.style.animationDelay=(Math.random()*.55)+"s";box.appendChild(s)}}
+function restart(){
+  if(state.mode==="online"){
+    window.requestOnlineRematch?.();
+    return;
+  }
+  startGame(state.mode||"ai",state.diff||"normal");
+}
+function backMenu(){clearInterval(timerId);if(state.mode==="online")window.leaveOnlineRoom?.();show("menu")}
+document.getElementById("answer").addEventListener("keydown",e=>{if(e.key==="Enter")submitAnswer()});
+document.getElementById("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")savePlayerName()});
+
+/* جسر الاتصال بين ملف اللعبة وملف online.js */
+Object.assign(window,{
+  letters, state, playerData, rnd, norm, getWords, categoriesForLetter, chooseCategoryForLetter,
+  buildLetters, render, show, toast, addXP, savePlayer, checkAchievements, fireworks, beep
+});
+
+loadPlayer();
+</script>
+<script type="module" src="online.js?v=6400"></script>
+</body>
+</html>
