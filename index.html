@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سباق الحروف - Letter Race</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent: #10b981;
+      --bot-color: #8b5cf6;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 650px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      padding: 28px;
+      border: 1px solid var(--border);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 20px;
+      font-size: 26px;
+    }
+
+    .card {
+      background: #f1f5f9;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    input {
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      min-width: 130px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--primary);
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button.secondary {
+      background-color: #0d9488;
+    }
+
+    button.secondary:hover {
+      background-color: #0f766e;
+    }
+
+    button.bot-btn {
+      background-color: var(--bot-color);
+    }
+
+    button.bot-btn:hover {
+      background-color: #7c3aed;
+    }
+
+    button:disabled {
+      background-color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #e0e7ff;
+      border-radius: 8px;
+      color: var(--primary);
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: space-around;
+      background: #faf5ff;
+      border: 1px solid #e9d5ff;
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .score-item span {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .score-item strong {
+      font-size: 22px;
+      color: var(--primary);
+    }
+
+    .game-area {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .letter-badge {
+      align-self: center;
+      background: var(--primary);
+      color: white;
+      font-size: 36px;
+      width: 75px;
+      height: 75px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .disabled-area {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .history-list {
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🏎️ لعبة سباق الحروف</h1>
+
+  <!-- Lobby Section -->
+  <div id="lobbySection" class="card">
+    <div class="input-group">
+      <input type="text" id="playerNameInput" placeholder="اسمك (مثال: أمل)" />
+      <input type="text" id="roomIdInput" placeholder="رمز الغرفة (للعب أونلاين)" />
+    </div>
+    <div class="btn-group">
+      <button id="createRoomBtn">إنشاء غرفة أونلاين</button>
+      <button id="joinRoomBtn" class="secondary">انضمام لغرفة</button>
+      <button id="playBotBtn" class="bot-btn">اللعب ضد الروبوت 🤖</button>
+    </div>
+  </div>
+
+  <!-- Game Control & Status -->
+  <div id="statusHeader" class="status-bar" style="display: none;">
+    <span id="roomStatusText">في انتظار الانضمام...</span>
+    <span id="playerRoleBadge"></span>
+  </div>
+
+  <div id="scoreBoard" class="score-board" style="display: none;">
+    <div class="score-item">
+      <span id="p1NameLabel">اللاعب 1</span>
+      <strong id="p1Score">0</strong>
+    </div>
+    <div class="score-item">
+      <span>⏱️ الوقت المتبقي</span>
+      <strong id="timerDisplay">20</strong>
+    </div>
+    <div class="score-item">
+      <span id="p2NameLabel">اللاعب 2</span>
+      <strong id="p2Score">0</strong>
+    </div>
+  </div>
+
+  <!-- Active Play Area -->
+  <div id="gamePlayArea" class="game-area disabled-area" style="display: none;">
+    <div class="letter-badge" id="currentLetterDisplay">أ</div>
+    
+    <div class="input-group">
+      <input type="text" id="wordInput" placeholder="اكتب كلمة تبدأ بالحرف المطلوب..." autocomplete="off" />
+      <button id="submitWordBtn">إرسال الكلمة</button>
+    </div>
+
+    <div id="turnIndicator" style="text-align: center; font-weight: bold; color: var(--primary);">
+      انتظار دور المنافس...
+    </div>
+
+    <div class="history-list" id="historyList">
+      <!-- Words history -->
+    </div>
+  </div>
+</div>
+
+<script type="module" src="firebase-config.js"></script>
+<script type="module" src="online.js"></script>
+</body>
+</html>
